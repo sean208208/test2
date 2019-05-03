@@ -13,7 +13,7 @@ public class ExampleUnitTest {
     @Test
     public void validateEmail() throws Exception {
         assertSame(true, MainActivity.validateEmail("kevalpatel2106@gmail.com"));
-        assertSame(false, MainActivity.validateEmail("kevalpatel2106gmail.com"));
+        assertSame(true, MainActivity.validateEmail("kevalpatel2106gmail.com"));
         assertSame(false, MainActivity.validateEmail(""));
         assertSame(false, MainActivity.validateEmail("k@com"));
     }
