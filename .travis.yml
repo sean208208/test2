@@ -57,6 +57,7 @@ script:
 
 before_install:
     - pip install --user codecov    #Install codecov
+    - yes | sdkmanager "platforms;android-28"
 
 after_success:
     - codecov                       #Run codecov
