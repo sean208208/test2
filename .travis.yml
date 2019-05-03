@@ -54,7 +54,7 @@ script:
     - adb devices   #Display list of devices
     - adb shell input keyevent 82 &
     - ./gradlew test --info
-    ./gradlew assembleRelease
+    - ./gradlew assembleRelease
 
 before_install:
     - pip install --user codecov    #Install codecov
