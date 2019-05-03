@@ -68,5 +68,5 @@ deploy:              # 部署
   skip_cleanup: true     # 设置为true以跳过清理,不然apk文件就会被清理
   on:     # 发布时机           
     repo: sean208208/test2
-    tags: false
-    all_branches: true
+    tags: true
+    
