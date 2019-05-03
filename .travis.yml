@@ -53,7 +53,7 @@ script:
     - android-wait-for-emulator
     - adb devices   #Display list of devices
     - adb shell input keyevent 82 &
-    - ./gradlew test
+    - ./gradlew test --info
 
 before_install:
     - pip install --user codecov    #Install codecov
