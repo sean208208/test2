@@ -1,32 +1,74 @@
-language: android   # 声明构建语言环境
+language: android
 jdk: oraclejdk8
+sudo: false
 
-sudo: false         # 开启基于容器的Travis CI任务，让编译效率更高。
+env:
+    matrix:
+        - ANDROID_TARGET=android-22 ANDROID_ABI=armeabi-v7a
+      
+    global:
+        - ADB_INSTALL_TIMEOUT=10    #Time out to 10 mins
 
-android:            # 配置信息
-  components:
-    - tools
-    - build-tools-28.0.2              
-    - android-22
-    - android-28
-    - extra-android-m2repository     # Android Support Repository
-    - extra-android-support          # Support Library
+before_cache:
+    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
-before_install:     
- - chmod +x gradlew  # 改变gradlew的访问权限
-  - yes | sdkmanager "platforms;android-28"
+cache:
+  directories:      #Cache all dirs under .gradle folder
+    - $HOME/.gradle/daemon      #Cache daemon logs
+    - $HOME/.gradle/native      #Cache library downloaded from the gradle dependency
+    - $HOME/.gradle/wrapper     #Cache the gradle
 
-script:              # 执行:下面的命令
-  - ./gradlew assembleRelease  
+android:
+    update_sdk: true
+    components:
+        - platform-tools
+        - tools
+        - build-tools-28.0.3
+        - android-22
+        - android-28
 
-before_deploy:       # 部署之前
-  # 使用 mv 命令进行修改apk文件的名字
-  - mv app/build/outputs/apk/app-release.apk app/build/outputs/apk/buff.apk  
- 
+        # Additional components
+        - extra-google-google_play_services
+        - extra-google-m2repository
+        - extra-android-m2repository
+
+        #system images
+        - sys-img-armeabi-v7a-android-22
+        
+
+licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
+before_script:
+    - chmod +x gradlew      #Grand permissions
+    - android list targets
+    - echo no | android create avd --force --name test --target $ANDROID_TARGET --abi $ANDROID_ABI    #Create AVD for given api
+    - emulator -avd test -no-skin -no-audio -no-window &    #Start emulator
+
+script:
+    - echo "Travis branch is $TRAVIS_BRANCH"
+    - echo "Travis branch is in pull request $TRAVIS_PULL+REQUEST"
+    - android-wait-for-emulator
+    - adb devices   #Display list of devices
+    - adb shell input keyevent 82 &
+    - ./gradlew test --info
+    ./gradlew assembleRelease
+
+before_install:
+    - pip install --user codecov    #Install codecov
+    - yes | sdkmanager "platforms;android-28"
+
+after_success:
+    - codecov                       #Run codecov
+
+after_failure: "cat $TRAVIS_BUILD_DIR/app/build/outputs/lint-results-debug.xml"
+
 deploy:              # 部署
   provider: releases # 部署到GitHub Release，除此之外，Travis CI还支持发布到fir.im、AWS、Google App Engine等
   api_key:           # 填写GitHub的token （Settings -> Personal access tokens -> Generate new token）
-    secure: 98b91a314b7c883077a9ebaa7af0eb9d12fc9b1c 
+    secure: 8026600537cb34bc8f42d71279518f074d7e93bc 
   file: app/build/outputs/apk/buff.apk   # 部署文件路径
   skip_cleanup: true     # 设置为true以跳过清理,不然apk文件就会被清理
   on:     # 发布时机           
