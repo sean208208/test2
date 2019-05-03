@@ -63,7 +63,7 @@ after_failure: "cat $TRAVIS_BUILD_DIR/app/build/outputs/lint-results-debug.xml"
 deploy:              # 部署
   provider: releases # 部署到GitHub Release，除此之外，Travis CI还支持发布到fir.im、AWS、Google App Engine等
   api_key:           # 填写GitHub的token （Settings -> Personal access tokens -> Generate new token）
-    secure: 75d0bb18a62e06235edc2fc32cecebac78c77788 
+    secure: $good 
   file: "app/build/outputs/apk/release/app-release-unsigned.apk"  # 部署文件路径
   skip_cleanup: true     # 设置为true以跳过清理,不然apk文件就会被清理
   on:     # 发布时机           
